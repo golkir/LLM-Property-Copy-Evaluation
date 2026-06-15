@@ -63,6 +63,7 @@ We use **Python 3.13** and `uv`.
 ```bash
 uv sync
 uv pip install -e .
+source .venv/bin/activate
 ```
 
 ## Interactive execution
