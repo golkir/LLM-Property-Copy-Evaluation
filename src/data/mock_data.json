@@ -1,0 +1,100 @@
+[
+  {
+    "property_id": 10482,
+    "property_name": "The Luminary Penthouse",
+    "property_type": "NormalApartment",
+    "description": {
+      "name": "The Luminary Loft & Penthouse",
+      "headline": "Stunning Loft with Panoramic Skyline Views & Private Terrace",
+      "description": "<p>Experience the ultimate urban retreat in this architectural masterpiece. Featuring <strong>double-height ceilings</strong> and floor-to-ceiling windows, this penthouse floods with natural light.</p><br><p>Located just steps away from the cultural district, you'll enjoy unparalleled access to fine dining and transit options.</p>"
+    },
+    "amenities": [
+      "InternetBroadband",
+      "BathroomAndLaundry",
+      "DishWasher",
+      "AirConditioningCentral",
+      "SecuredParking"
+    ],
+    "image_urls": [
+      "https://images.example.com/properties/10482/hero.jpg",
+      "https://images.example.com/properties/10482/terrace.jpg",
+      "https://images.example.com/properties/10482/bedroom1.jpg"
+    ],
+    "reviews": [
+      "An absolute dream stay! The views at sunset are completely unmatched. The location was perfect for walking everywhere.",
+      "The apartment was pristine, and the host was incredibly responsive. Having a dedicated parking spot downtown was a lifesaver.",
+      "Beautiful design, but a bit of street noise can be heard on weekend nights. Overall, a 5-star experience."
+    ],
+    "num_of_reviews": 3,
+    "average_review_score": 4.87,
+    "rental_info": {
+      "max_guests": 4,
+      "bedrooms": 2,
+      "bathrooms": 2
+    },
+    "location": {
+      "city": "Chicago",
+      "country": "United States",
+      "latitude": 41.8781,
+      "longitude": -87.6298
+    },
+    "policies": {
+      "cancellation_policy": "Full refund up to 5 days prior to arrival.",
+      "payment_schedule": "50% deposit at booking, remaining balance due 7 days before check-in.",
+      "damage_deposit": "$300 holds on card required at check-in."
+    },
+    "house_rules": {
+      "check_in_time": "3 PM",
+      "check_out_time": "11 AM"
+    }
+  },
+  {
+    "property_id": 10483,
+    "property_name": "Serenity Bay Estate",
+    "property_type": "Villa",
+    "description": {
+      "name": "Serenity Bay Luxury Infinity Villa",
+      "headline": "Oceanfront Luxury Estate with Private Pool & Chef services",
+      "description": "<p>Welcome to paradise. Serenity Bay is a fully staffed <em>ultra-luxury villa</em> tucked into a cliffside overlooking the crystal waters of the Mediterranean.</p><p>Relax by our heated <strong>infinity pool</strong> or enjoy a custom meal prepared by your personal onboard chef.</p>"
+    },
+    "amenities": [
+      "InternetBroadband",
+      "BathroomAndLaundry",
+      "DishWasher",
+      "PrivateInfinityPool",
+      "ChefServiceInclusive",
+      "EVCharger"
+    ],
+    "image_urls": [
+      "https://images.example.com/properties/10483/exterior_pool.jpg",
+      "https://images.example.com/properties/10483/master_suite.jpg",
+      "https://images.example.com/properties/10483/beach_path.jpg"
+    ],
+    "reviews": [
+      "Words cannot describe how beautiful this villa is. The staff treated us like royalty. We are already booking for next summer!",
+      "The kitchen setup is incredible, and the infinity pool views are surreal. Pure luxury from start to finish."
+    ],
+    "num_of_reviews": 2,
+    "average_review_score": 5.0,
+    "rental_info": {
+      "max_guests": 8,
+      "bedrooms": 4,
+      "bathrooms": 5
+    },
+    "location": {
+      "city": "Amalfi",
+      "country": "Italy",
+      "latitude": 40.6331,
+      "longitude": 14.6028
+    },
+    "policies": {
+      "cancellation_policy": "Strict: Non-refundable within 30 days of check-in.",
+      "payment_schedule": "100% payment required at time of booking.",
+      "damage_deposit": null
+    },
+    "house_rules": {
+      "check_in_time": "4 PM",
+      "check_out_time": "10 AM"
+    }
+  }
+]

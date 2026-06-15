@@ -8,5 +8,14 @@ requires-python = "==3.13.*"
 dependencies = [
     "inspect-ai>=0.3.0",
     "pytest",
-    "pydantic"
+    "pydantic",
+    "google-genai>=0.1.1",
+    "anthropic",
+    "pandas",
+    "python-dotenv",
+    "matplotlib"
 ]
+
+
+[tool.uv]
+package = true
