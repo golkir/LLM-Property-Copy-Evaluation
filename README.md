@@ -51,6 +51,10 @@ We use `inspect-ai` to run evaluations and store logs for reproducibility. We pr
   - Conforms to `MarketingCopy` schema
   - Contains exactly 3 amenity highlights
   - Produces valid JSON structure
+- Rubric
+  - 0.0 = Invalid JSON or Schema
+  - 0.5 = Valid schema but constraint violation
+  - 1.0 = Fully correct output
 
 ---
 
@@ -93,3 +97,9 @@ Inside `evals.ipynb`:
 from inspect_ai.log import read_eval_log
 
 log = read_eval_log("path/to/log.json")
+```
+
+## Running Tests
+```bash
+pytest
+```
