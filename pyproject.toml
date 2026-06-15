@@ -1,0 +1,12 @@
+[project]
+name = "llm-property-copy-eval"
+version = "0.1.0"
+description = "LLM evaluation of property copy generation"
+readme = "README.md"
+requires-python = "==3.13.*"
+
+dependencies = [
+    "inspect-ai>=0.3.0",
+    "pytest",
+    "pydantic"
+]
