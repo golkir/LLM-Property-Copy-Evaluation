@@ -1,75 +1,25 @@
 import json
-import re
-from typing import Optional
 from pydantic import BaseModel, Field, ValidationError
 from inspect_ai.scorer import scorer, Scorer, Target, Score
 from inspect_ai.solver import TaskState
-from inspect_ai.model import get_model, ChatMessageUser
 from property_listing.models import MarketingCopy, GroundednessEval
 from property_listing.services.llm import LLMProviderService
 from property_listing.services.llm import GeminiService
-
-class EvaluationJudgeOutput(BaseModel):
-    reasoning: str = Field(description="Step-by-step audit comparing copy claims against source fields.")
-    grade: int = Field(description="The numeric score assigned based strictly on the provided rubric.")
-
-GROUNDEDNESS_RUBRIC = """
-You are an expert quality assurance auditor evaluating a real estate property marketing assistant.
-Compare the GENERATED MARKETING COPY against the verified RAW PROPERTY DATA and evaluate it for GROUNDEDNESS.
-
-<property_data>
-{source_data}
-</property_data>
-
-<generated_marketing_copy>
-{generated_copy}
-</generated_marketing_copy>
-
----
-CRITERIA FOR SCORING:
-- 5 (Perfectly Grounded): Every single claim in the marketing copy maps directly to an explicit field in the input data.
-- 3 (Minor Extrapolation): The text includes minor subjective flair but makes no structural or numeric misstatements.
-- 1 (Severe Hallucination): The model completely invented non-existent data points.
-"""
-
-
-
-# @scorer(metrics=[])
-# def groundedness_scorer(judge_service: LLMProviderService) -> Scorer:
-#     """
-#     Custom Inspect AI Scorer that checks if marketing copy is strictly 
-#     grounded in the underlying data structure.
-#     """
-#     async def score(state: TaskState, target: Target) -> Score:
-#         source_data = state.metadata.get("raw_input_data")
-#         generated_copy = state.output.text
-#         prompt = GROUNDEDNESS_RUBRIC.format(
-#             source_data=source_data,
-#             generated_copy=generated_copy)
-#         model = get_model(judge_service)
-#         response = await model.generate([ChatMessageUser(content=prompt)])
-#         judge_output = response.text
-        
-#         final_score = 1
-#         if "GRADE: 5" in judge_output:
-#             final_score = 5
-#         elif "GRADE: 3" in judge_output:
-#             final_score = 3
-            
-#         return Score(
-#             value=final_score,
-#             explanation=judge_output
-#         )
-#     return score
+from pydantic import ValidationError
 
 
 @scorer(metrics=[])
-def groundedness_scorer_cot() -> Scorer:
+def groundedness_scorer_cot(judge_service: LLMProviderService) -> Scorer:
     """
     Evaluates groundedness using LLM-as-a-Judge extracting each claim. 
     Groundedness assessment is done based on LLM per-claim verdict aggregation
     """
+
+    judge_service = judge_service if judge_service else GeminiService(model_name="gemini-2.5-flash")
+
     async def score(state: TaskState, target: Target) -> Score:
+
+        
         raw_source_data = state.metadata.get("raw_input_data")
         generated_copy_text = state.metadata["generated_copy_json"]
         
@@ -94,8 +44,7 @@ def groundedness_scorer_cot() -> Scorer:
         3. Populate the required schema where 'verdict' is true ONLY if the raw data explicitly confirms the claim. If the claim is missing, exaggerated, or invented, set 'verdict' to false.
         """
 
-        judge_service = GeminiService(model_name="gemini-2.5-flash")
-        
+    
         evaluation_data = judge_service.generate_structured(
             prompt=evaluation_prompt,
             system_instruction="You are an expert AI data auditor that performs strict compliance verification.",
@@ -134,32 +83,38 @@ def groundedness_scorer_cot() -> Scorer:
 
     return score
 
-# @scorer(metrics=[])
-# def structure_scorer() -> Scorer:
-#     """
-#     Validates if the generated marketing copy strictly adheres to 
-#     the structure specified by the target Pydantic model schema.
-#     """
-#     async def score(state: TaskState, target: Target) -> Score:
-#         raw_output = state.output.text.strip()
-        
-#         try:
-#             if "```json" in raw_output:
-#                 raw_output = raw_output.split("```json")[1].split("```")[0].strip()
-            
-#             json_data = json.loads(raw_output)
-            
-#             MarketingCopy(**json_data)
-            
-#             if len(json_data.get("amenity_highlights", [])) != 3:
-#                 return Score(
-#                     value=3, 
-#                     explanation="Output is valid JSON but failed structural constraints (did not equal 3 highlights)."
-#                 )
-                
-#             return Score(value=5, explanation="Perfectly structured valid JSON matching Pydantic schema.")
-            
-#         except (json.JSONDecodeError, ValidationError) as e:
-#             return Score(value=1, explanation=f"Structural breakdown: Failed to parse valid JSON. Error: {str(e)}")
 
-#     return score
+
+@scorer(metrics=[])
+def structure_scorer() -> Scorer:
+    """
+    0.0 = Invalid JSON
+    0.25 = Valid JSON but schema invalid
+    0.6 = Valid schema but constraint violation
+    1.0 = Fully correct output
+    """
+
+    async def score(state: TaskState, target: Target) -> Score:
+        prop_copy = state.metadata.get("generated_copy_json", "")
+
+        try:
+            model = MarketingCopy.model_validate_json(prop_copy)
+            amenity_count = len(model.amenity_highlights)
+            if amenity_count != 3:
+                return Score(
+                    value=0.5,
+                    explanation=f"Valid schema but wrong amenity count: {amenity_count} (expected 3)."
+                )
+
+            return Score(
+                value=1,
+                explanation="Valid JSON + schema + structural constraints satisfied."
+            )
+
+        except ValidationError as e:
+            return Score(
+                value=0.0,
+                explanation=f"Schema validation failed: {str(e)}"
+            )
+
+    return score

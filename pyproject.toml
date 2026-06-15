@@ -5,17 +5,22 @@ description = "LLM evaluation of property copy generation"
 readme = "README.md"
 requires-python = "==3.13.*"
 
+
 dependencies = [
     "inspect-ai>=0.3.0",
     "pytest",
+    "pytest-asyncio",
     "pydantic",
     "google-genai>=0.1.1",
     "anthropic",
     "pandas",
     "python-dotenv",
-    "matplotlib"
+    "matplotlib",
+    "ipywidgets"
 ]
 
+[tool.setuptools]
+package-dir = {"" = "src"}
 
-[tool.uv]
-package = true
+[tool.setuptools.packages.find]
+where = ["src"]

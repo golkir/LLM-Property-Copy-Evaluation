@@ -1,13 +1,16 @@
 import json
-from inspect_ai import Task, task
+from pathlib import Path
+from inspect_ai import Task, task, eval
 from inspect_ai.dataset import json_dataset, FieldSpec, Sample, MemoryDataset
 from inspect_ai.scorer import multi_scorer
 
 from property_listing.generator import PropertyCopyGenerator, run_generation_pipeline
 from property_listing.services.llm import GeminiService
-from property_listing.eval.scorers import groundedness_scorer_cot
+from property_listing.eval.scorers import groundedness_scorer_cot, structure_scorer
 
-with open("../../data/mock_data.json") as f:
+DATA_PATH = Path(__file__).resolve().parents[3] / "data" / "mock_data.json"
+
+with open(DATA_PATH) as f:
     properties = json.load(f)
 
 dataset = MemoryDataset([
@@ -33,18 +36,21 @@ def property_copy_eval() -> Task:
         plan=[
             run_generation_pipeline(generator=property_generator)
         ],
-        scorer = groundedness_scorer_cot()
-        # scorer=multi_scorer(
-        #     scorers=[
-        #         groundedness_scorer_cot()
-        #         # structure_scorer()
-        #     ],
-        #     reducer="mean"
-        # )
+        scorer=multi_scorer(
+            scorers=[
+                groundedness_scorer_cot(),
+                structure_scorer()
+            ],
+            reducer="mean"
+        )
     )
 
 
 def run_eval():
-    evaluation_results = eval(tasks="src/property_listing/eval/eval_pipeline.py")
+    evaluation_results = eval(tasks=[property_copy_eval])
     print(f"Evaluation Complete! Log written to: {evaluation_results[0].location}")
     return evaluation_results
+
+
+if __name__ == "__main__":
+    run_eval()
