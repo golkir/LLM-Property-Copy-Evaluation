@@ -1,12 +1,9 @@
-
 import asyncio
 import pytest
 import json
 
-from inspect_ai.scorer import Score
 
 from property_listing.eval.scorers import structure_scorer
-from property_listing.models import MarketingCopy
 
 
 class MockState:
@@ -42,10 +39,12 @@ async def test_invalid_json():
 async def test_schema_invalid():
     scorer_fn = structure_scorer()
 
-    payload = json.dumps({
-        "slug_headline": "Nice stay",
-        # missing required fields
-    })
+    payload = json.dumps(
+        {
+            "slug_headline": "Nice stay",
+            # missing required fields
+        }
+    )
 
     state = MockState({"generated_copy_json": payload})
     target = MockTarget()
@@ -60,12 +59,14 @@ async def test_schema_invalid():
 async def test_constraint_violation():
     scorer_fn = structure_scorer()
 
-    payload = json.dumps({
-        "slug_headline": "Nice stay",
-        "hero_paragraph": "A great place. Very central. Close to transport.",
-        "amenity_highlights": ["WiFi", "Pool"],  # invalid: only 2
-        "guest_expectations": "Check-in after 3pm"
-    })
+    payload = json.dumps(
+        {
+            "slug_headline": "Nice stay",
+            "hero_paragraph": "A great place. Very central. Close to transport.",
+            "amenity_highlights": ["WiFi", "Pool"],  # invalid: only 2
+            "guest_expectations": "Check-in after 3pm",
+        }
+    )
 
     state = MockState({"generated_copy_json": payload})
     target = MockTarget()
@@ -80,12 +81,14 @@ async def test_constraint_violation():
 async def test_valid_output():
     scorer_fn = structure_scorer()
 
-    payload = json.dumps({
-        "slug_headline": "Luxury stay in Madrid",
-        "hero_paragraph": "Central location. Stylish interiors. Walkable neighborhood.",
-        "amenity_highlights": ["WiFi", "Gym", "Pool"],
-        "guest_expectations": "Check-in after 3pm. No smoking."
-    })
+    payload = json.dumps(
+        {
+            "slug_headline": "Luxury stay in Madrid",
+            "hero_paragraph": "Central location. Stylish interiors. Walkable neighborhood.",
+            "amenity_highlights": ["WiFi", "Gym", "Pool"],
+            "guest_expectations": "Check-in after 3pm. No smoking.",
+        }
+    )
 
     state = MockState({"generated_copy_json": payload})
     target = MockTarget()

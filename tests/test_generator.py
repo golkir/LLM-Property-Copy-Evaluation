@@ -1,17 +1,9 @@
-import json
 import pytest
-from pathlib import Path
-from unittest.mock import MagicMock
-
 from property_listing.generator import PropertyCopyGenerator, run_generation_pipeline
-from property_listing.models import PropertyInput, MarketingCopy
-from property_listing.services.llm import LLMProviderService
-from fixtures import mock_llm, sample_output, sample_property
+from property_listing.models import MarketingCopy
 
 
-
-def test_property_copy_generator(sample_output, sample_property, mock_llm ):
-
+def test_property_copy_generator(sample_property, mock_llm):
     generator = PropertyCopyGenerator(llm_service=mock_llm)
 
     result = generator.generate(sample_property)
@@ -22,7 +14,7 @@ def test_property_copy_generator(sample_output, sample_property, mock_llm ):
     assert "Check-in after 3pm" in result.guest_expectations
 
 
-def test_llm_called_with_correct_args(sample_output, sample_property, mock_llm):
+def test_llm_called_with_correct_args(sample_property, mock_llm):
     generator = PropertyCopyGenerator(llm_service=mock_llm)
 
     generator.generate(sample_property)
@@ -37,9 +29,9 @@ def test_llm_called_with_correct_args(sample_output, sample_property, mock_llm):
 
 
 @pytest.mark.asyncio
-async def test_solver_stage(sample_output, sample_property, mock_llm):
+async def test_solver_stage(mock_llm, sample_property):
     generator = PropertyCopyGenerator(llm_service=mock_llm)
-    
+
     stage = run_generation_pipeline(generator)
 
     class MockState:

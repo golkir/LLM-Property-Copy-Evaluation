@@ -27,16 +27,16 @@ We implement:
 
 ## Evaluation System
 
-We use `inspect-ai` to run evaluations and store logs for reproducibility. We provide generated evaluation logs in the `.logs` directory (see how to read them below).
+We use `inspect-ai` to run evaluations and store logs for reproducibility. We provide generated evaluation logs in the `logs` directory (see how to read them below).
 
 ---
 
 ## Metrics
 
-### 1. Groundedness (Chain-of-Thought Scorer)
+### 1. Groundedness (Scorer based on CoT and claim extraction)
 
 - Metric: `groundedness_scorer_cot`
-- Evaluates whether each claim in generated text is supported by raw property data
+- Evaluates whether each claim in generated text is supported by the input property data
 - Produces:
   - Per-claim audit
   - Final normalized score (0–1) based on the supported/unsupported claims ratio
@@ -76,7 +76,9 @@ This notebook:
 - Runs the full generation pipeline  
 - Executes `inspect-ai` evaluation tasks  
 - Stores logs  
-- Performs metric aggregation and visualization  
+- Performs metric aggregation and visualization
+
+**Note**: To run generation/evaluation pipeline make sure that environmental variable ANTHROPIC_API_KEY is set in environment. You can use the notebook just for analyzing and visualizing existing Inspect AI evaluation logs. 
 
 ---
 

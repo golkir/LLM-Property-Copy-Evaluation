@@ -28,6 +28,22 @@ def sample_output():
 
 
 @pytest.fixture
+def sample_output_json():
+    return json.dumps(
+        {
+            "slug_headline": "Stay in Madrid",
+            "hero_paragraph": "Central location. Modern design. Great transport links.",
+            "amenity_highlights": [
+                "Blazing-fast Internet",
+                "Air Conditioning",
+                "Fully equipped kitchen",
+            ],
+            "guest_expectations": "Check-in after 3pm. No smoking.",
+        }
+    )
+
+
+@pytest.fixture
 def mock_llm(sample_output):
     llm = MagicMock()
     llm.generate_structured.return_value = sample_output

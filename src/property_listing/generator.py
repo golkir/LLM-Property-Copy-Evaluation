@@ -5,7 +5,6 @@ from property_listing.services.llm import LLMProviderService
 
 
 class BaseGenerationPipeline(ABC):
-
     def __init__(self, llm_service: LLMProviderService):
         self.llm_service = llm_service
 
@@ -15,9 +14,7 @@ class BaseGenerationPipeline(ABC):
 
 
 class PropertyCopyGenerator(BaseGenerationPipeline):
-
     def __init__(self, llm_service: LLMProviderService):
-
         super().__init__(llm_service=llm_service)
 
     def _build_prompt(self, property_data: PropertyInput) -> str:
@@ -31,7 +28,7 @@ Here is the verified data for the property you must write about:
 {serialized_json}
 </property_data>
 
-CRITICAL INSTRUCTIONS AND RULES:
+Critical Instructions and Rules:
 1. Grounding: You must ONLY use facts provided inside the <property_data> block. Do not invent amenities, nearby attractions, or scenery that is not explicitly supported by the input data.
 2. Tone matching: Ensure the tone matches the `property_type` (e.g., an urban "NormalApartment" should feel convenient, while a "Villa" should feel exclusive/luxury).
 3. Amenity Mapping: For the `amenity_highlights`, select exactly 3 items from the `amenities` array provided. Translate their internal codes (e.g., "InternetBroadband") into customer-facing phrases (e.g., "Blazing-fast High-Speed Internet").
@@ -55,13 +52,12 @@ Generate the marketing copy based on these instructions and using provided outpu
 
 @solver
 def run_generation_pipeline(generator: PropertyCopyGenerator) -> Solver:
-
     async def stage(state: TaskState, generate: Generate) -> TaskState:
-       
         property_data = PropertyInput(**state.metadata["property"])
         state.metadata["raw_input_data"] = property_data.model_dump(mode="json")
         generated_copy = generator.generate(property_data)
-        state.metadata["generated_copy_json"] = generated_copy.model_dump(mode="json")
+        state.metadata["generated_copy"] = generated_copy.model_dump(mode="json")
+        state.metadata["generated_copy_json"] = generated_copy.model_dump_json()
 
         return state
 

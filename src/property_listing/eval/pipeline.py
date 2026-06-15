@@ -1,48 +1,48 @@
 import json
 from pathlib import Path
+from typing import List
+
+
 from inspect_ai import Task, task, eval
-from inspect_ai.dataset import json_dataset, FieldSpec, Sample, MemoryDataset
-from inspect_ai.scorer import multi_scorer
+from inspect_ai.dataset import Sample, MemoryDataset
 
 from property_listing.generator import PropertyCopyGenerator, run_generation_pipeline
-from property_listing.services.llm import GeminiService
+from property_listing.services.llm import AnthropicService
 from property_listing.eval.scorers import groundedness_scorer_cot, structure_scorer
 
 DATA_PATH = Path(__file__).resolve().parents[3] / "data" / "mock_data.json"
 
-with open(DATA_PATH) as f:
-    properties = json.load(f)
 
-dataset = MemoryDataset([
-    Sample(
-        id=str(property["property_id"]),
-        input="",
-        metadata={
-            "property": property
-        }
+def load_properties(path: Path) -> List[dict]:
+    with open(path, "r") as f:
+        return json.load(f)
+
+
+def build_dataset(properties: List[dict]) -> MemoryDataset:
+    return MemoryDataset(
+        [
+            Sample(
+                id=str(p["property_id"]),
+                input="",
+                metadata={"property": p},
+            )
+            for p in properties
+        ]
     )
-    for property in properties
-])
 
 
 @task
 def property_copy_eval() -> Task:
-    llm_service = GeminiService(model_name="gemini-2.5-flash")
+    llm_service = AnthropicService()
     property_generator = PropertyCopyGenerator(llm_service=llm_service)
-    
-    
+
+    properties = load_properties(DATA_PATH)
+    dataset = build_dataset(properties)
+
     return Task(
         dataset=dataset,
-        plan=[
-            run_generation_pipeline(generator=property_generator)
-        ],
-        scorer=multi_scorer(
-            scorers=[
-                groundedness_scorer_cot(),
-                structure_scorer()
-            ],
-            reducer="mean"
-        )
+        plan=[run_generation_pipeline(generator=property_generator)],
+        scorer=[groundedness_scorer_cot(), structure_scorer()],
     )
 
 
